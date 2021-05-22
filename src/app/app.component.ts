@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { MqttService } from './mqtt.service';
+import { User } from './model/user';
 
 @Component({
   selector: 'app-root',
@@ -9,13 +10,18 @@ import { MqttService } from './mqtt.service';
 })
 export class AppComponent implements OnInit {
   title = 'crowd-app';
+  user: User;
 
   constructor(
     private mqttService: MqttService
-  ) { }
+  ) {
+    this.user = new User();
+    this.user.username = 'username';
+    this.user.password = 'password';
+  }
 
   ngOnInit() {
-    this.mqttService.connect().subscribe({
+    this.mqttService.connect(this.user).subscribe({
       next: (value) => console.log(`MQTT Service: ${value}`),
       error: (err) => console.error(err),
       complete: () => console.log('complete')
