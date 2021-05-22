@@ -12,3 +12,17 @@
 .spacer {
     flex: 1 1 auto;
 }
+
+.location-headers-align .mat-expansion-panel-header-title,
+.location-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.location-headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.location-headers-align .mat-form-field + .mat-form-field {
+  margin-left: 8px;
+}

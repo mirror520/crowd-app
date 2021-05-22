@@ -4,7 +4,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MqttModule } from 'ngx-mqtt';
 
 import { MatButtonModule } from '@angular/material/button';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
@@ -22,7 +25,10 @@ import { MQTT_SERVICE_OPTIONS } from '../environments/environment';
     BrowserAnimationsModule,
     AppRoutingModule,
     MatButtonModule,
+    MatExpansionModule,
+    MatFormFieldModule,
     MatIconModule,
+    MatInputModule,
     MatSidenavModule,
     MatToolbarModule,
     MqttModule.forRoot(MQTT_SERVICE_OPTIONS)
