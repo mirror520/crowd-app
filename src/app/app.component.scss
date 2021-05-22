@@ -1,0 +1,14 @@
+@import '~@angular/material/theming';
+
+#toolbar {
+    @include mat-elevation(4);
+    height: 10vh;
+}
+
+.toolbar-text {
+    font-size: 4vmin;
+}
+
+.spacer {
+    flex: 1 1 auto;
+}
