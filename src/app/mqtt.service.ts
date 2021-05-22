@@ -17,7 +17,7 @@ export class MqttService {
 
   connect(user: User): Observable<string> {
     const options: IMqttServiceOptions = MQTT_SERVICE_OPTIONS;
-    options.username = `mqtt:${user.username}`;
+    options.username = user.username;
     options.password = user.password;
 
     this.mqttService.connect(options);

@@ -6,7 +6,7 @@ export class User {
         return this._username;
     }
     public set username(value: string) {
-        this._username = value;
+        this._username = `mqtt:${value}`;
     }
 
     public get password(): string {
