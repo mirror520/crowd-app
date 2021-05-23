@@ -1,12 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MqttConnectionState } from 'ngx-mqtt';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { CrowdService } from './crowd.service';
 import { MqttService } from './mqtt.service';
-import { Location } from './model/location';
 import { User } from './model/user';
 
 @Component({
@@ -14,31 +12,34 @@ import { User } from './model/user';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
-  private _currentLocation: Location;
-
+export class AppComponent {
   title = 'crowd-app';
   connectionState = false;
-
   mqttSubscription: Subscription;
-  locations: Observable<Location[]>;
-  locationFormGroup: FormGroup;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private crowdService: CrowdService,
-    private formBuilder: FormBuilder,
-    private mqttService: MqttService
+    private mqttService: MqttService,
+    private router: Router
   ) {
-    const user = new User();
-    user.username = this.activatedRoute.snapshot.paramMap.get('username');
-    user.password = this.activatedRoute.snapshot.paramMap.get('password');
-
     this.activatedRoute.queryParams.subscribe(params => {
+      let username;
+      let password;
       if (params['username'] && params['password']) {
+        username = params['username'];
+        password = params['password'];
+
+        localStorage.clear();
+      } else {
+        username = localStorage.getItem("username");
+        password = localStorage.getItem("password");
+      }
+
+      if (username && password) {
         const user = new User();
-        user.username = params['username'];
-        user.password = params['password'];
+        user.username = username;
+        user.password = password;
 
         this.connectMqtt(user);
       }
@@ -46,15 +47,23 @@ export class AppComponent implements OnInit {
   }
 
   connectMqtt(user: User) {
-    if (this.mqttSubscription) return;
+    if (this.mqttSubscription) {
+      this.mqttSubscription.unsubscribe();
+      this.mqttSubscription = null;
+    }
 
     this.mqttSubscription = this.mqttService.connect(user).subscribe({
       next: (value) => {
         console.log(`MQTT Service: ${MqttConnectionState[value]}`);
-        
-        this.connectionState = value === MqttConnectionState.CONNECTED;
-        if (this.connectionState) {
-          this.locations = this.crowdService.getLocations();
+
+        if (value === MqttConnectionState.CONNECTED) {
+          this.connectionState = true;
+
+          this.mqttService.currentUser = user;
+          this.checkUserRole(user);
+
+          localStorage.setItem("username", user.username);
+          localStorage.setItem("password", user.password);
         }
       },
       error: (err) => console.error(err),
@@ -62,28 +71,18 @@ export class AppComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.locationFormGroup = this.formBuilder.group({
-      name: [], capacity: [], current: []
-    });
-  }
-
-  set currentLocation(value: Location) {
-    this._currentLocation = value;
-
-    this.locationFormGroup = this.formBuilder.group({
-      name: [
-        value.name,
-        [ Validators.required ]
-      ],
-      capacity: [
-        value.capacity,
-        [ Validators.required, Validators.min(0) ] 
-      ],
-      current: [
-        value.current,
-        [ Validators.required, Validators.min(0) ]
-      ]
+  checkUserRole(user: User) {
+    this.mqttService.subscribeTopic(`users/${user.username}/admin`).subscribe({
+      next: (value) => {
+        if (value.payload.toString() === "true") {
+          this.currentUser.isAdmin = true;
+          this.router.navigate(['admin']);
+        } else  {
+          this.currentUser.isAdmin = false;
+        }
+      },
+      error: (err) => console.error(err),
+      complete: () => console.log('complete')
     });
   }
 
@@ -91,17 +90,11 @@ export class AppComponent implements OnInit {
     this.crowdService.addLocation();
   }
 
-  updateLocation(formGroup: FormGroup, currentLocation: Location) {
-    const newLocation = formGroup.value;
-    const diffKey = Object.keys(newLocation).filter(k => newLocation[k] !== currentLocation[k]);
-
-    for (let key of diffKey) {
-      let message = String(newLocation[key])
-      this.crowdService.updateLocation(currentLocation, key, message);
-    }
-  }
-
   refreshLocations() {
     this.crowdService.refreshLocations();
+  }
+
+  get currentUser(): User {
+    return this.mqttService.currentUser;
   }
 }

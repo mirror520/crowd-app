@@ -9,6 +9,7 @@ import { User } from './model/user';
   providedIn: 'root'
 })
 export class MqttService {
+  currentUser: User;
 
   constructor(
     private mqttService: Mqtt
@@ -16,7 +17,7 @@ export class MqttService {
 
   connect(user: User): Observable<MqttConnectionState> {
     const options: IMqttServiceOptions = MQTT_SERVICE_OPTIONS;
-    options.username = user.username;
+    options.username = `mqtt:${user.username}`;
     options.password = user.password;
 
     this.mqttService.connect(options);
@@ -25,7 +26,7 @@ export class MqttService {
   }
 
   subscribeTopic(topic: string): Observable<IMqttMessage> {
-    return this.mqttService.observe(topic);
+    return this.mqttService.observe(topic, { qos: 2 });
   }
 
   publishMessage(message: string, topic: string) {
@@ -33,6 +34,10 @@ export class MqttService {
       topic, message, { qos: 2, retain: true }
     );
 
-    console.log(`publish ${message} to topic: ${topic}`);
+    console.log(`publish message: ${message} to topic: ${topic}`);
+  }
+
+  status(): Observable<MqttConnectionState> {
+    return this.mqttService.state;
   }
 }

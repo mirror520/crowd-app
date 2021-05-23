@@ -41,7 +41,6 @@ export class CrowdService {
         } else {
           if (value.topic == 'locations/count') {
             this.count = +value.payload.toString();
-            console.log(`count: ${this.count}`);
           }
         }
 
