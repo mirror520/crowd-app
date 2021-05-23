@@ -1,12 +1,28 @@
 <mat-sidenav-container fullscreen>
   <header>
     <mat-toolbar id="toolbar" color="primary">
-      <span class="toolbar-text">臺中市政府場管容留管制</span>
+      <span>臺中市政府場管容留管制</span>
       <span class="spacer"></span>
-      <mat-icon *ngIf="connectionState; else disconnect">cloud</mat-icon>
-      <ng-template #disconnect>
-        <mat-icon>cloud_off</mat-icon>
-      </ng-template>
+      <button mat-icon-button matTooltip="連線狀態" matTooltipPosition="left">
+        <mat-icon *ngIf="connectionState; else disconnect">cloud_done</mat-icon>
+        <ng-template #disconnect>
+          <mat-icon>cloud_off</mat-icon>
+        </ng-template>
+      </button>
+      <button mat-icon-button matTooltip="選單" 
+              [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="addLocation()">
+          <mat-icon>add</mat-icon>
+          <span>新增地點</span>
+        </button>
+        <button mat-menu-item (click)="refreshLocations()">
+          <mat-icon>refresh</mat-icon>
+          <span>全部歸零</span>
+        </button>
+      </mat-menu>
     </mat-toolbar>
   </header>
 
@@ -22,7 +38,8 @@
         </mat-panel-description>
       </mat-expansion-panel-header>
 
-      <form [formGroup]="locationFormGroup">
+      <form #locationForm="ngForm" [formGroup]="locationFormGroup" 
+            (ngSubmit)="updateLocation(locationForm.form, location)">
         <mat-form-field>
           <mat-label>地點名稱</mat-label>
           <input matInput formControlName="name">
@@ -41,11 +58,9 @@
         </mat-form-field>
 
         <mat-action-row>
-          <button mat-button 
-                  (click)="locationPanel.close()">取消</button>
-          <button mat-raised-button color="primary" 
-                  [disabled]="locationFormGroup.invalid"
-                  (click)="save(location)">儲存</button>
+          <button mat-button (click)="locationPanel.close()">取消</button>
+          <button mat-raised-button type="submit" color="primary" 
+                  [disabled]="locationFormGroup.invalid">儲存</button>
         </mat-action-row>
       </form>
     </mat-expansion-panel>

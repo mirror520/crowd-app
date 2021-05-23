@@ -4,6 +4,20 @@ export class Location {
     private _capacity: number;
     private _current: number;
 
+    public updateFromTopic(attr: string, message: string) {
+        switch (attr) {
+            case 'name':
+                this.name = message;
+                break;
+            case 'capacity':
+                this.capacity = +message;
+                break;
+            case 'current':
+                this.current = +message;
+                break;
+        }
+    }
+
     public get id(): number {
         return this._id;
     }

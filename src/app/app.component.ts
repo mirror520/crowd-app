@@ -86,11 +86,22 @@ export class AppComponent implements OnInit {
       ]
     });
   }
-  get currentLocation(): Location {
-    return this._currentLocation;
+
+  addLocation() {
+    this.crowdService.addLocation();
   }
 
-  save(location: Location) {
-    console.log(location);
+  updateLocation(formGroup: FormGroup, currentLocation: Location) {
+    const newLocation = formGroup.value;
+    const diffKey = Object.keys(newLocation).filter(k => newLocation[k] !== currentLocation[k]);
+
+    for (let key of diffKey) {
+      let message = String(newLocation[key])
+      this.crowdService.updateLocation(currentLocation, key, message);
+    }
+  }
+
+  refreshLocations() {
+    this.crowdService.refreshLocations();
   }
 }

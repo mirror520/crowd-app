@@ -32,5 +32,7 @@ export class MqttService {
     this.mqttService.unsafePublish(
       topic, message, { qos: 2, retain: true }
     );
+
+    console.log(`publish ${message} to topic: ${topic}`);
   }
 }
