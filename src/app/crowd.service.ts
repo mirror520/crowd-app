@@ -36,11 +36,43 @@ export class CrowdService {
             this.locations[lid] = location;
           }
 
-          location[attr] = value.payload.toString();
+          const message = value.payload.toString();
+          location.updateFromTopic(attr, message);
+        } else {
+          if (value.topic == 'locations/count') {
+            this.count = +value.payload.toString();
+            console.log(`count: ${this.count}`);
+          }
         }
 
         return this.locations.filter(i => i !== null);
       })
     );
+  }
+
+  addLocation() {
+    let count = this.count + 1;
+    let topic = `locations/count`;
+    this.mqttService.publishMessage(String(count), topic);
+
+    this.mqttService.publishMessage('新的地點', `locations/${count}/name`);
+    this.mqttService.publishMessage('0', `locations/${count}/capacity`);
+    this.mqttService.publishMessage('0', `locations/${count}/current`);
+  }
+
+  updateLocation(location: Location, key: string, value: string) {
+    let topic = `locations/${location.id}/${key}`;
+    let message = value;
+    this.mqttService.publishMessage(message, topic);
+  }
+
+  refreshLocations() {
+    const message = String(0);
+    for (let location of this.locations) {
+      if (!location) continue;
+
+      let topic = `locations/${location.id}/current`;
+      this.mqttService.publishMessage(message, topic);
+    }
   }
 }

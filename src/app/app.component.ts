@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MqttConnectionState } from 'ngx-mqtt';
 import { Observable, Subscription } from 'rxjs';
@@ -13,16 +14,20 @@ import { User } from './model/user';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  private _currentLocation: Location;
+
   title = 'crowd-app';
   connectionState = false;
 
   mqttSubscription: Subscription;
   locations: Observable<Location[]>;
+  locationFormGroup: FormGroup;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private crowdService: CrowdService,
+    private formBuilder: FormBuilder,
     private mqttService: MqttService
   ) {
     const user = new User();
@@ -57,7 +62,46 @@ export class AppComponent {
     });
   }
 
-  save(location: Location) {
-    console.log(location);
+  ngOnInit() {
+    this.locationFormGroup = this.formBuilder.group({
+      name: [], capacity: [], current: []
+    });
+  }
+
+  set currentLocation(value: Location) {
+    this._currentLocation = value;
+
+    this.locationFormGroup = this.formBuilder.group({
+      name: [
+        value.name,
+        [ Validators.required ]
+      ],
+      capacity: [
+        value.capacity,
+        [ Validators.required, Validators.min(0) ] 
+      ],
+      current: [
+        value.current,
+        [ Validators.required, Validators.min(0) ]
+      ]
+    });
+  }
+
+  addLocation() {
+    this.crowdService.addLocation();
+  }
+
+  updateLocation(formGroup: FormGroup, currentLocation: Location) {
+    const newLocation = formGroup.value;
+    const diffKey = Object.keys(newLocation).filter(k => newLocation[k] !== currentLocation[k]);
+
+    for (let key of diffKey) {
+      let message = String(newLocation[key])
+      this.crowdService.updateLocation(currentLocation, key, message);
+    }
+  }
+
+  refreshLocations() {
+    this.crowdService.refreshLocations();
   }
 }
