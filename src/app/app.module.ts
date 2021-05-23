@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MqttModule } from 'ngx-mqtt';
 
@@ -31,7 +32,8 @@ import { MQTT_SERVICE_OPTIONS } from '../environments/environment';
     MatInputModule,
     MatSidenavModule,
     MatToolbarModule,
-    MqttModule.forRoot(MQTT_SERVICE_OPTIONS)
+    MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

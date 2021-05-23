@@ -11,39 +11,43 @@
   </header>
 
   <mat-accordion class="location-headers-align">
-    <mat-expansion-panel #locationPanel *ngFor="let location of locations | async">
+    <mat-expansion-panel #locationPanel *ngFor="let location of locations | async"
+                         (opened)="currentLocation = location">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          {{ location?.id }} - {{ location?.name }}
+          {{ location?.name }}
         </mat-panel-title>
         <mat-panel-description>
-          容留人數: {{ location?.capacity }} | 目前人數: {{ location?.current }}
+          {{ location?.current }} / {{ location?.capacity }}
         </mat-panel-description>
       </mat-expansion-panel-header>
 
-      <mat-form-field>
-        <mat-label>地點名稱</mat-label>
-        <input matInput [value]="location?.name">
-      </mat-form-field>
+      <form [formGroup]="locationFormGroup">
+        <mat-form-field>
+          <mat-label>地點名稱</mat-label>
+          <input matInput formControlName="name">
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>容留人數</mat-label>
-        <input matInput type="number" min="0" 
-               [value]="location?.capacity">
-      </mat-form-field>
+        <mat-form-field>
+          <mat-label>容留人數</mat-label>
+          <input matInput formControlName="capacity"
+                 type="number">
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>目前人數</mat-label>
-        <input matInput type="number" min="0" 
-               [value]="location?.current">
-      </mat-form-field>
+        <mat-form-field>
+          <mat-label>目前人數</mat-label>
+          <input matInput formControlName="current"
+                 type="number">
+        </mat-form-field>
 
-      <mat-action-row>
-        <button mat-button 
-                (click)="locationPanel.close()">取消</button>
-        <button mat-raised-button color="primary" 
-                (click)="save(location)">儲存</button>
-      </mat-action-row>
+        <mat-action-row>
+          <button mat-button 
+                  (click)="locationPanel.close()">取消</button>
+          <button mat-raised-button color="primary" 
+                  [disabled]="locationFormGroup.invalid"
+                  (click)="save(location)">儲存</button>
+        </mat-action-row>
+      </form>
     </mat-expansion-panel>
   </mat-accordion>
 </mat-sidenav-container>

@@ -29,6 +29,8 @@ export class MqttService {
   }
 
   publishMessage(message: string, topic: string) {
-    this.mqttService.unsafePublish(topic, message, { qos: 1, retain: true });
+    this.mqttService.unsafePublish(
+      topic, message, { qos: 2, retain: true }
+    );
   }
 }

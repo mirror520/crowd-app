@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MqttConnectionState } from 'ngx-mqtt';
 import { Observable, Subscription } from 'rxjs';
@@ -13,16 +14,20 @@ import { User } from './model/user';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  private _currentLocation: Location;
+
   title = 'crowd-app';
   connectionState = false;
 
   mqttSubscription: Subscription;
   locations: Observable<Location[]>;
+  locationFormGroup: FormGroup;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private crowdService: CrowdService,
+    private formBuilder: FormBuilder,
     private mqttService: MqttService
   ) {
     const user = new User();
@@ -55,6 +60,34 @@ export class AppComponent {
       error: (err) => console.error(err),
       complete: () => console.log('complete')
     });
+  }
+
+  ngOnInit() {
+    this.locationFormGroup = this.formBuilder.group({
+      name: [], capacity: [], current: []
+    });
+  }
+
+  set currentLocation(value: Location) {
+    this._currentLocation = value;
+
+    this.locationFormGroup = this.formBuilder.group({
+      name: [
+        value.name,
+        [ Validators.required ]
+      ],
+      capacity: [
+        value.capacity,
+        [ Validators.required, Validators.min(0) ] 
+      ],
+      current: [
+        value.current,
+        [ Validators.required, Validators.min(0) ]
+      ]
+    });
+  }
+  get currentLocation(): Location {
+    return this._currentLocation;
   }
 
   save(location: Location) {
