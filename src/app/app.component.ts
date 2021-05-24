@@ -53,10 +53,10 @@ export class AppComponent {
   }
 
   connectMqtt(user: User) {
-    if (this.mqttSubscription) {
-      this.mqttSubscription.unsubscribe();
-      this.mqttSubscription = null;
-    }
+    if ((this.mqttSubscription) && 
+        (this.mqttService.currentUser?.username == user.username)) {
+      return;
+    };
 
     this.mqttSubscription = this.mqttService.connect(user).subscribe({
       next: (value) => {
@@ -89,6 +89,7 @@ export class AppComponent {
 
           case 'user':
             this.mqttService.currentUser.role = UserRole.User;
+            this.router.navigate(['']);
             break;
         }
       },

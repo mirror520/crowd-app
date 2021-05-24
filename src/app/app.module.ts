@@ -5,6 +5,7 @@ import { MqttModule } from 'ngx-mqtt';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { QRCodeModule } from 'angularx-qrcode';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -21,7 +22,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AdminComponent } from './admin/admin.component';
 
-import { MQTT_SERVICE_OPTIONS } from '../environments/environment';
+import { MQTT_SERVICE_OPTIONS, environment } from '../environments/environment';
 import { LocationComponent } from './location/location.component';
 
 @NgModule({
@@ -47,7 +48,13 @@ import { LocationComponent } from './location/location.component';
     MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
     NgxChartsModule,
     QRCodeModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      // Register the ServiceWorker as soon as the app is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]
