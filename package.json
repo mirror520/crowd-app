@@ -21,6 +21,8 @@
     "@angular/platform-browser": "~11.2.14",
     "@angular/platform-browser-dynamic": "~11.2.14",
     "@angular/router": "~11.2.14",
+    "@swimlane/ngx-charts": "^18.0.1",
+    "angularx-qrcode": "^11.0.0",
     "ngx-mqtt": "^8.0.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",

@@ -1,0 +1,30 @@
+<div>
+  <ngx-charts-pie-grid label="目前人數"
+    [view]="view"
+    [scheme]="chartColors"
+    [designatedTotal]="currentLocation?.capacity"
+    [results]="currentLocation?.crowd">
+  </ngx-charts-pie-grid>
+
+  <button mat-fab class="add-fab" color="warn" 
+          (click)="addCurrent()">
+    <mat-icon>add</mat-icon>
+  </button>
+
+  <button mat-fab class="sub-fab" color="warn"
+          (click)="subCurrent()">
+    <mat-icon>remove</mat-icon>
+  </button>
+</div>
+
+<mat-toolbar color="primary" class="qrcode-toolbar">
+  <qrcode *ngIf="currentLocation?.code" 
+          width="100" height="100" 
+          [qrdata]="currentLocation.smsCode"
+          [errorCorrectionLevel]="'M'"></qrcode>
+  <mat-form-field class="form-field">
+    <mat-label>簡訊實聯制場館代碼</mat-label>
+    <input #code matInput [value]="currentLocation?.code" 
+           (keyup.enter)="changeLocationCode(code.value)">
+  </mat-form-field>
+</mat-toolbar>

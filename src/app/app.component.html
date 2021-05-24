@@ -9,60 +9,23 @@
           <mat-icon>cloud_off</mat-icon>
         </ng-template>
       </button>
-      <button mat-icon-button matTooltip="選單" 
-              [matMenuTriggerFor]="menu">
-        <mat-icon>more_vert</mat-icon>
-      </button>
-      <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="addLocation()">
-          <mat-icon>add</mat-icon>
-          <span>新增地點</span>
+      <div *ngIf="isAdmin">
+        <button mat-icon-button matTooltip="選單" 
+                [matMenuTriggerFor]="menu">
+          <mat-icon>more_vert</mat-icon>
         </button>
-        <button mat-menu-item (click)="refreshLocations()">
-          <mat-icon>refresh</mat-icon>
-          <span>全部歸零</span>
-        </button>
-      </mat-menu>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="addLocation()">
+            <mat-icon>add</mat-icon>
+            <span>新增地點</span>
+          </button>
+          <button mat-menu-item (click)="refreshLocations()">
+            <mat-icon>refresh</mat-icon>
+            <span>全部歸零</span>
+          </button>
+        </mat-menu>
+      </div>
     </mat-toolbar>
   </header>
-
-  <mat-accordion class="location-headers-align">
-    <mat-expansion-panel #locationPanel *ngFor="let location of locations | async"
-                         (opened)="currentLocation = location">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          {{ location?.name }}
-        </mat-panel-title>
-        <mat-panel-description>
-          {{ location?.current }} / {{ location?.capacity }}
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-
-      <form #locationForm="ngForm" [formGroup]="locationFormGroup" 
-            (ngSubmit)="updateLocation(locationForm.form, location)">
-        <mat-form-field>
-          <mat-label>地點名稱</mat-label>
-          <input matInput formControlName="name">
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>容留人數</mat-label>
-          <input matInput formControlName="capacity"
-                 type="number">
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>目前人數</mat-label>
-          <input matInput formControlName="current"
-                 type="number">
-        </mat-form-field>
-
-        <mat-action-row>
-          <button mat-button (click)="locationPanel.close()">取消</button>
-          <button mat-raised-button type="submit" color="primary" 
-                  [disabled]="locationFormGroup.invalid">儲存</button>
-        </mat-action-row>
-      </form>
-    </mat-expansion-panel>
-  </mat-accordion>
+  <router-outlet></router-outlet>
 </mat-sidenav-container>

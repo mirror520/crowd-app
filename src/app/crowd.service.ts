@@ -13,6 +13,7 @@ export class CrowdService {
   private topicCheck = new RegExp('^locations\/(?<lid>.{0,})\/(?<attr>.{0,})');
 
   locations: Location[] = Array();
+  location: Location;
   count: number = 0;
 
   constructor(
@@ -41,11 +42,33 @@ export class CrowdService {
         } else {
           if (value.topic == 'locations/count') {
             this.count = +value.payload.toString();
-            console.log(`count: ${this.count}`);
           }
         }
 
         return this.locations.filter(i => i !== null);
+      })
+    );
+  }
+
+  getLocation(lid: number): Observable<Location> {
+    return this.mqttService.subscribeTopic(`locations/${lid}/#`).pipe(
+      retry(),
+      map((value: IMqttMessage) => {
+        const match = value.topic.match(this.topicCheck);
+        if (match) {
+          const lid = match.groups?.lid;
+          const attr = match.groups?.attr;
+          const message = value.payload.toString();
+
+          if (!this.location) {
+            this.location = new Location();
+            this.location.id = +lid;
+          }
+
+          this.location.updateFromTopic(attr, message);
+        }
+
+        return this.location;
       })
     );
   }
@@ -64,6 +87,20 @@ export class CrowdService {
     let topic = `locations/${location.id}/${key}`;
     let message = value;
     this.mqttService.publishMessage(message, topic);
+  }
+
+  updateCode(location: Location, code: string) {
+    this.updateLocation(location, 'code', code);
+  }
+
+  addCurrent(location: Location) {
+    let current = location.current + 1;
+    this.updateLocation(location, 'current', String(current));
+  }
+
+  subCurrent(location: Location) {
+    let current = location.current - 1;
+    this.updateLocation(location, 'current', String(current));
   }
 
   refreshLocations() {

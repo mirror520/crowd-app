@@ -3,8 +3,12 @@ export class Location {
     private _name: string;
     private _capacity: number;
     private _current: number;
+    private _code: string;
+
+    public crowd: any[];
 
     public updateFromTopic(attr: string, message: string) {
+        console.log(`attr: ${attr}, message: ${message}`);
         switch (attr) {
             case 'name':
                 this.name = message;
@@ -14,6 +18,9 @@ export class Location {
                 break;
             case 'current':
                 this.current = +message;
+                break;
+            case 'code':
+                this.code = message;
                 break;
         }
     }
@@ -44,5 +51,21 @@ export class Location {
     }
     public set current(value: number) {
         this._current = value;
+
+        this.crowd = [{
+            name: this.name,
+            value: this._current
+        }];
+    }
+
+    public get code(): string {
+        return this._code;
+    }
+    public set code(value: string) {
+        this._code = value;
+    }
+
+    public get smsCode(): string {
+        return `SMSTO:1922:場所代碼：${this._code}\n本次實聯簡訊限防疫目的使用。`;
     }
 }
