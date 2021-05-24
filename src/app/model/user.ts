@@ -1,7 +1,7 @@
 export class User {
     private _username: string;
     private _password: string;
-    private _isAdmin: boolean;
+    private _isAdmin: boolean = false;
 
     public get username(): string {
         return this._username;

@@ -13,6 +13,7 @@ export class CrowdService {
   private topicCheck = new RegExp('^locations\/(?<lid>.{0,})\/(?<attr>.{0,})');
 
   locations: Location[] = Array();
+  location: Location;
   count: number = 0;
 
   constructor(
@@ -49,6 +50,29 @@ export class CrowdService {
     );
   }
 
+  getLocation(lid: number): Observable<Location> {
+    return this.mqttService.subscribeTopic(`locations/${lid}/#`).pipe(
+      retry(),
+      map((value: IMqttMessage) => {
+        const match = value.topic.match(this.topicCheck);
+        if (match) {
+          const lid = match.groups?.lid;
+          const attr = match.groups?.attr;
+          const message = value.payload.toString();
+
+          if (!this.location) {
+            this.location = new Location();
+            this.location.id = +lid;
+          }
+
+          this.location.updateFromTopic(attr, message);
+        }
+
+        return this.location;
+      })
+    );
+  }
+
   addLocation() {
     let count = this.count + 1;
     let topic = `locations/count`;
@@ -63,6 +87,20 @@ export class CrowdService {
     let topic = `locations/${location.id}/${key}`;
     let message = value;
     this.mqttService.publishMessage(message, topic);
+  }
+
+  updateCode(code: string) {
+    this.updateLocation(this.location, 'code', code);
+  }
+
+  addCurrent() {
+    let current = this.location.current + 1;
+    this.updateLocation(this.location, 'current', String(current));
+  }
+
+  subCurrent() {
+    let current = this.location.current - 1;
+    this.updateLocation(this.location, 'current', String(current));
   }
 
   refreshLocations() {
