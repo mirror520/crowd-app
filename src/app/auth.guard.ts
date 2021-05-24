@@ -3,6 +3,7 @@ import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree } fro
 import { Observable } from 'rxjs';
 
 import { MqttService } from './mqtt.service';
+import { UserRole } from './model/user';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class AuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
-    if (this.mqttService.currentUser?.isAdmin) {
+    if (this.mqttService.currentUser?.role === UserRole.Admin) {
       return true;
     } else {
       console.log('請使用管理者帳號登入');

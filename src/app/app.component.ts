@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MqttConnectionState } from 'ngx-mqtt';
-import { fromEvent, Observable, Subscription } from 'rxjs';
-import { map, debounceTime } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
 
 import { CrowdService } from './crowd.service';
 import { MqttService } from './mqtt.service';
 import { Location } from './model/location';
-import { User } from './model/user';
+import { User, UserRole } from './model/user';
 
 @Component({
   selector: 'app-root',
@@ -17,18 +16,12 @@ import { User } from './model/user';
 export class AppComponent {
   title = 'crowd-app';
   connectionState = false;
+  isAdmin = false;
   view = [document.documentElement.clientWidth, 450];
 
   locations: Observable<Location[]>;
   location: Observable<Location>;
   mqttSubscription: Subscription;
-
-  chartColors = { name: 'aqua', 
-    domain: [
-      '#e0f7fa', '#b2ebf2', '#80deea', '#4dd0e1', '#26c6da',
-      '#00bcd4', '#00acc1', '#0097a7', '#00838f', '#006064'
-    ]
-  };
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -36,15 +29,6 @@ export class AppComponent {
     private mqttService: MqttService,
     private router: Router
   ) {
-    fromEvent(window, 'resize').pipe(
-      map(() => {
-        let width = document.documentElement.clientWidth;
-        let height = document.documentElement.clientHeight;
-        return [width, (height <= 650) ? height - 150 : 450];
-      }),
-      debounceTime(200)
-    ).subscribe(screen => this.view = screen);
-
     this.activatedRoute.queryParams.subscribe(params => {
       let username;
       let password;
@@ -64,11 +48,6 @@ export class AppComponent {
         user.password = password;
 
         this.connectMqtt(user);
-      }
-
-      if (params['location']) {
-        let lid = +params['location'];
-        this.location = this.crowdService.getLocation(lid);
       }
     });
   }
@@ -99,11 +78,18 @@ export class AppComponent {
   }
 
   checkUserRole(user: User) {
-    this.mqttService.subscribeTopic(`users/${user.username}/admin`).subscribe({
+    this.mqttService.subscribeTopic(`users/${user.username}/role`).subscribe({
       next: (value) => {
-        if (value.payload.toString() === "true") {
-          this.currentUser.isAdmin = true;
-          this.router.navigate(['admin']);
+        switch (value.payload.toString()) {
+          case 'admin':
+            this.mqttService.currentUser.role = UserRole.Admin;
+            this.isAdmin = true;
+            this.router.navigate(['admin']);
+            break;
+
+          case 'user':
+            this.mqttService.currentUser.role = UserRole.User;
+            break;
         }
       },
       error: (err) => console.error(err),
@@ -117,25 +103,5 @@ export class AppComponent {
 
   refreshLocations() {
     this.crowdService.refreshLocations();
-  }
-
-  changeLocationCode(code) {
-    this.crowdService.updateCode(code);
-  }
-
-  addCurrent() {
-    this.crowdService.addCurrent();
-  }
-
-  subCurrent() {
-    this.crowdService.subCurrent();
-  }
-
-  get currentUser(): User {
-    return this.mqttService.currentUser;
-  }
-
-  get locationCode(): string {
-    return this.crowdService?.location?.code;
   }
 }

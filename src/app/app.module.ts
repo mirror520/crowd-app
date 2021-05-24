@@ -22,11 +22,13 @@ import { AppComponent } from './app.component';
 import { AdminComponent } from './admin/admin.component';
 
 import { MQTT_SERVICE_OPTIONS } from '../environments/environment';
+import { LocationComponent } from './location/location.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AdminComponent
+    AdminComponent,
+    LocationComponent
   ],
   imports: [
     AppRoutingModule,

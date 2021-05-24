@@ -64,4 +64,8 @@ export class Location {
     public set code(value: string) {
         this._code = value;
     }
+
+    public get smsCode(): string {
+        return `SMSTO:1922:場所代碼：${this._code}\n本次實聯簡訊限防疫目的使用。`;
+    }
 }

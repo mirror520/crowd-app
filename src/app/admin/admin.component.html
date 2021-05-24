@@ -1,5 +1,5 @@
 <mat-accordion class="location-headers-align">
-  <mat-expansion-panel #locationPanel *ngFor="let location of locations | async"
+  <mat-expansion-panel #locationPanel *ngFor="let location of locations"
                        (opened)="currentLocation = location">
     <mat-expansion-panel-header>
       <mat-panel-title>

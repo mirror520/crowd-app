@@ -1,7 +1,7 @@
 export class User {
     private _username: string;
     private _password: string;
-    private _isAdmin: boolean = false;
+    private _role: UserRole;
 
     public get username(): string {
         return this._username;
@@ -17,10 +17,15 @@ export class User {
         this._password = value;
     }
 
-    public get isAdmin(): boolean {
-        return this._isAdmin;
+    public get role(): UserRole {
+        return this._role;
     }
-    public set isAdmin(value: boolean) {
-        this._isAdmin = value;
+    public set role(value: UserRole) {
+        this._role = value;
     }
+}
+
+export enum UserRole {
+    Admin = 'admin',
+    User = 'user'
 }

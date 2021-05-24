@@ -89,18 +89,18 @@ export class CrowdService {
     this.mqttService.publishMessage(message, topic);
   }
 
-  updateCode(code: string) {
-    this.updateLocation(this.location, 'code', code);
+  updateCode(location: Location, code: string) {
+    this.updateLocation(location, 'code', code);
   }
 
-  addCurrent() {
-    let current = this.location.current + 1;
-    this.updateLocation(this.location, 'current', String(current));
+  addCurrent(location: Location) {
+    let current = location.current + 1;
+    this.updateLocation(location, 'current', String(current));
   }
 
-  subCurrent() {
-    let current = this.location.current - 1;
-    this.updateLocation(this.location, 'current', String(current));
+  subCurrent(location: Location) {
+    let current = location.current - 1;
+    this.updateLocation(location, 'current', String(current));
   }
 
   refreshLocations() {

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MqttConnectionState } from 'ngx-mqtt';
-import { Observable } from 'rxjs';
 
 import { CrowdService } from '../crowd.service';
 import { MqttService } from '../mqtt.service';
@@ -15,7 +14,7 @@ import { Location } from '../model/location';
 export class AdminComponent implements OnInit {
   private _currentLocation: Location;
 
-  locations: Observable<Location[]>;
+  locations: Location[];
   locationFormGroup: FormGroup;
 
   constructor(
@@ -28,7 +27,7 @@ export class AdminComponent implements OnInit {
     this.mqttService.status().subscribe({
       next: (value) => {
         if (value === MqttConnectionState.CONNECTED) {
-          this.locations = this.crowdService.getLocations();
+          this.getLocations();
         }
       },
       error: (err) => console.error(err),
@@ -40,6 +39,17 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  getLocations() {
+    this.crowdService.getLocations().subscribe({
+      next: (value) => this.locations = value,
+      error: (err) => console.error(err),
+      complete: () => console.log('complete')
+    });
+  }
+
+  get currentLocation(): Location {
+    return this._currentLocation;
+  }
   set currentLocation(value: Location) {
     this._currentLocation = value;
 
