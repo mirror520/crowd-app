@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MqttConnectionState } from 'ngx-mqtt';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { CrowdService } from './crowd.service';
 import { MqttService } from './mqtt.service';
-import { Location } from './model/location';
 import { User, UserRole } from './model/user';
 
 @Component({
@@ -19,8 +18,6 @@ export class AppComponent {
   isAdmin = false;
   view = [document.documentElement.clientWidth, 450];
 
-  locations: Observable<Location[]>;
-  location: Observable<Location>;
   mqttSubscription: Subscription;
 
   constructor(

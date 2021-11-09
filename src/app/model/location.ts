@@ -53,7 +53,7 @@ export class Location {
         this._current = value;
 
         this.crowd = [{
-            name: this.name,
+            name: this._name,
             value: this._current
         }];
     }
